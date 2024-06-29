@@ -1,0 +1,567 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  Integradora
+
+  Sample SAM Template for Integradora
+
+Globals:
+  Function:
+    Timeout: 100
+    MemorySize: 128
+
+Resources:
+
+  LambdaExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: LambdaBasicExecution
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - logs:CreateLogGroup
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                Resource: arn:aws:logs:*:*:*
+        - PolicyName: CognitoUserPoolAcess
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - cognito-idp:AdminCreateUser
+                  - cognito-idp:AdminGetUser
+                  - cognito-idp:AdminDeleteUser
+                Resource: arn:aws:cognito-idp:us-east-1:137237570477:userpool/us-east-1_hpKh8IecL
+
+  # Definición de la función Lambda para obtener categorías
+  GetCategoriaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: get_categories/
+      Handler: get_categories.lambda_handler
+      Runtime: python3.9
+      Architectures:
+        - x86_64
+      Environment:
+        Variables:
+          DB_USER: !Ref DBUser
+          DB_PASSWORD: !Ref DBPassword
+          DB_NAME: !Ref DBName
+          DB_HOST: !Ref DBHost
+      Events:
+        GetCategoria:
+          Type: Api
+          Properties:
+            Path: /categoria
+            Method: GET
+
+  # Definición de la función Lambda para crear una categoría
+  CreateCategoriaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: create_category/
+      Handler: create_category.lambda_handler
+      Runtime: python3.9
+      Architectures:
+        - x86_64
+      Environment:
+        Variables:
+          DB_USER: !Ref DBUser
+          DB_PASSWORD: !Ref DBPassword
+          DB_NAME: !Ref DBName
+          DB_HOST: !Ref DBHost
+      Events:
+        CreateCategoria:
+          Type: Api
+          Properties:
+            Path: /categoria
+            Method: POST
+
+  # Definición de la función Lambda para actualizar una categoría
+  UpdateCategoriaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: update_category/
+      Handler: update_category.lambda_handler
+      Runtime: python3.9
+      Architectures:
+        - x86_64
+      Environment:
+        Variables:
+          DB_USER: !Ref DBUser
+          DB_PASSWORD: !Ref DBPassword
+          DB_NAME: !Ref DBName
+          DB_HOST: !Ref DBHost
+      Events:
+        UpdateCategoria:
+          Type: Api
+          Properties:
+            Path: /categoria/{category_id}
+            Method: PUT
+
+  # Definición de la función Lambda para eliminar una categoría
+  DeleteCategoriaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: delete_category/
+      Handler: delete_category.lambda_handler
+      Runtime: python3.9
+      Architectures:
+        - x86_64
+      Environment:
+        Variables:
+          DB_USER: !Ref DBUser
+          DB_PASSWORD: !Ref DBPassword
+          DB_NAME: !Ref DBName
+          DB_HOST: !Ref DBHost
+      Events:
+        DeleteCategoria:
+          Type: Api
+          Properties:
+            Path: /categoria/{category_id}
+            Method: DELETE
+
+  # Definición de la función Lambda para obtener rateings
+  GetRateingFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: get_rateing/
+      Handler: get_rateing.lambda_handler
+      Runtime: python3.9
+      Architectures:
+        - x86_64
+      Environment:
+        Variables:
+          DB_USER: !Ref DBUser
+          DB_PASSWORD: !Ref DBPassword
+          DB_NAME: !Ref DBName
+          DB_HOST: !Ref DBHost
+      Events:
+        GetRateing:
+          Type: Api
+          Properties:
+            Path: /rateing
+            Method: GET
+
+  # Definición de la función Lambda para crear un rateing
+  CreateRateingFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: create_rateing/
+      Handler: create_rateing.lambda_handler
+      Runtime: python3.9
+      Architectures:
+        - x86_64
+      Environment:
+        Variables:
+          DB_USER: !Ref DBUser
+          DB_PASSWORD: !Ref DBPassword
+          DB_NAME: !Ref DBName
+          DB_HOST: !Ref DBHost
+      Events:
+        CreateRateing:
+          Type: Api
+          Properties:
+            Path: /rateing
+            Method: POST
+
+  # Definición de la función Lambda para actualizar un rateing
+  UpdateRateingFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: update_rateing/
+      Handler: update_rateing.lambda_handler
+      Runtime: python3.9
+      Architectures:
+        - x86_64
+      Environment:
+        Variables:
+          DB_USER: !Ref DBUser
+          DB_PASSWORD: !Ref DBPassword
+          DB_NAME: !Ref DBName
+          DB_HOST: !Ref DBHost
+      Events:
+        UpdateRateing:
+          Type: Api
+          Properties:
+            Path: /rateing/{id}
+            Method: PUT
+
+  # Definición de la función Lambda para eliminar un rateing
+  DeleteRateingFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: delete_rateing/
+      Handler: delete_rateing.lambda_handler
+      Runtime: python3.9
+      Architectures:
+        - x86_64
+      Environment:
+        Variables:
+          DB_USER: !Ref DBUser
+          DB_PASSWORD: !Ref DBPassword
+          DB_NAME: !Ref DBName
+          DB_HOST: !Ref DBHost
+      Events:
+        DeleteRateing:
+          Type: Api
+          Properties:
+            Path: /rateing/{id}
+            Method: DELETE
+
+  # Definición de la función Lambda para crear una subscripción
+  CreateSubscriptionFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: create_subscription/
+      Handler: create_subscription.lambda_handler
+      Runtime: python3.9
+      Architectures:
+        - x86_64
+      Environment:
+        Variables:
+          DB_USER: !Ref DBUser
+          DB_PASSWORD: !Ref DBPassword
+          DB_NAME: !Ref DBName
+          DB_HOST: !Ref DBHost
+      Events:
+        CreateSubscription:
+          Type: Api
+          Properties:
+            Path: /subscription
+            Method: POST
+
+  # Definición de la función Lambda para obtener una subcripción
+  GetSubscriptionFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: get_subscription/
+      Handler: get_subscription.lambda_handler
+      Runtime: python3.9
+      Architectures:
+        - x86_64
+      Environment:
+        Variables:
+          DB_USER: !Ref DBUser
+          DB_PASSWORD: !Ref DBPassword
+          DB_NAME: !Ref DBName
+          DB_HOST: !Ref DBHost
+      Events:
+        GetSubscription:
+          Type: Api
+          Properties:
+            Path: /subscription/{subscription_id}
+            Method: GET
+
+  # Definición de la función Lambda para obtener las películas
+  GetFilmsFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: get_films/
+      Handler: get_films.lambda_handler
+      Runtime: python3.9
+      Architectures:
+        - x86_64
+      Events:
+        GetFilms:
+          Type: Api
+          Properties:
+            Path: /films
+            Method: GET
+
+  # Definición de la función Lambda para crear una película
+  CreateFilmFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: create_film/
+      Handler: create_film.lambda_handler
+      Runtime: python3.9
+      Architectures:
+        - x86_64
+      Events:
+        CreateFilm:
+          Type: Api
+          Properties:
+            Path: /film
+            Method: POST
+
+  # Definición de la función Lambda para actualizar una película
+  UpdateFilmFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: update_film/
+      Handler: update_film.lambda_handler
+      Runtime: python3.9
+      Architectures:
+        - x86_64
+      Events:
+        UpdateFilm:
+          Type: Api
+          Properties:
+            Path: /film
+            Method: PUT
+
+  # Definición de la función Lambda para eliminar una película
+  DeleteFilmFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: delete_film/
+      Handler: delete_film.lambda_handler
+      Runtime: python3.9
+      Architectures:
+        - x86_64
+      Events:
+        DeleteFilm:
+          Type: Api
+          Properties:
+            Path: /film/{film_id}
+            Method: DELETE
+
+  # Definición de la función Lambda para crear un favorito
+  CreateFavoriteFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: create_favorite/
+      Handler: create_favorite.lambda_handler
+      Runtime: python3.9
+      Architectures:
+        - x86_64
+      Environment:
+        Variables:
+          DB_USER: !Ref DBUser
+          DB_PASSWORD: !Ref DBPassword
+          DB_NAME: !Ref DBName
+          DB_HOST: !Ref DBHost
+      Events:
+        CreateFavorito:
+          Type: Api
+          Properties:
+            Path: /favorito
+            Method: POST
+
+  # Definición de la función Lambda para eliminar un favorito
+  DeleteFavoriteFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: delete_favorite/
+      Handler: delete_favorite.lambda_handler
+      Runtime: python3.9
+      Architectures:
+        - x86_64
+      Environment:
+        Variables:
+          DB_USER: !Ref DBUser
+          DB_PASSWORD: !Ref DBPassword
+          DB_NAME: !Ref DBName
+          DB_HOST: !Ref DBHost
+      Events:
+        DeleteFavorito:
+          Type: Api
+          Properties:
+            Path: /favorito/
+            Method: DELETE
+
+  # Definición de la función Lambda para obtener favoritos
+  GetFavoritesFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: get_favorites/
+      Handler: get_favorites.lambda_handler
+      Runtime: python3.9
+      Architectures:
+        - x86_64
+      Environment:
+        Variables:
+          DB_USER: !Ref DBUser
+          DB_PASSWORD: !Ref DBPassword
+          DB_NAME: !Ref DBName
+          DB_HOST: !Ref DBHost
+      Events:
+        GetFavorito:
+          Type: Api
+          Properties:
+            Path: /favorito/{fk_user}
+            Method: GET
+
+  # Definición de la función Lambda para obtener usuarios
+
+  GetUserFunction:
+      Type: AWS::Serverless::Function
+      Properties:
+        CodeUri: get_user/
+        Handler: get_user.lambda_handler
+        Runtime: python3.9
+        Architectures:
+          - x86_64
+        Events:
+          GetUser:
+            Type: Api
+            Properties:
+              Path: /users
+              Method: GET
+
+  # Definición de la función Lambda para crear un usuario
+  CreateUserFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: create_user/
+      Handler: create_user.lambda_handler
+      Runtime: python3.9
+      Architectures:
+        - x86_64
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Environment:
+        Variables:
+          DB_USER: !Ref DBUser
+          DB_PASSWORD: !Ref DBPassword
+          DB_NAME: !Ref DBName
+          DB_HOST: !Ref DBHost
+      Events:
+        CreateUser:
+          Type: Api
+          Properties:
+            Path: /user
+            Method: POST
+
+  UpdatePasswordUserFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: set_password/
+      Handler: set_password.lambda_handler
+      Runtime: python3.9
+      Architectures:
+        - x86_64
+      Events:
+        UpdateUser:
+          Type: Api
+          Properties:
+            Path: /change-password
+            Method: PUT
+
+  LoginUserFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: set_login/
+      Handler: set_login.lambda_handler
+      Runtime: python3.9
+      Architectures:
+        - x86_64
+      Events:
+        UpdateUser:
+          Type: Api
+          Properties:
+            Path: /login
+            Method: POST
+
+  CreateUser2Function:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: insert_user_pool/
+      Handler: app.lambda_handler
+      Runtime: python3.9
+      Architectures:
+        - x86_64
+      Events:
+        CreateUser:
+          Type: Api
+          Properties:
+            Path: /pool
+            Method: POST
+
+  # Definición de la función Lambda para actualizar un usuario
+  UpdateUserFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: update_user/
+      Handler: update_user.lambda_handler
+      Runtime: python3.9
+      Architectures:
+        - x86_64
+      Events:
+        UpdateUser:
+          Type: Api
+          Properties:
+            Path: /user
+            Method: PUT
+
+  # Definición de la función Lambda para eliminar un usuario
+  DeleteUserFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: delete_user/
+      Handler: delete_user.lambda_handler
+      Runtime: python3.9
+      Architectures:
+        - x86_64
+      Events:
+        DeleteUser:
+          Type: Api
+          Properties:
+            Path: /user/{user_id}
+            Method: DELETE
+
+Parameters:
+  DBUser:
+    Type: String
+    Default: 'admin'
+  DBPassword:
+    Type: String
+    Default: 'nhL5zPpY1I9w'
+  DBName:
+    Type: String
+    Default: 'sispe'
+  DBHost:
+    Type: String
+    Default: 'integradora-lambda.czc42euyq8iq.us-east-1.rds.amazonaws.com'
+
+Outputs:
+  GetCategoriaApi:
+    Description: "API Gateway endpoint URL for Prod stage for GetCategoria function"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/categoria/"
+  CreateCategoriaApi:
+    Description: "API Gateway endpoint URL for Prod stage for CreateCategoria function"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/categoria/"
+  UpdateCategoriaApi:
+    Description: "API Gateway endpoint URL for Prod stage for UpdateCategoria function"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/categoria/"
+  DeleteCategoriaApi:
+    Description: "API Gateway endpoint URL for Prod stage for DeleteCategoria function"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/categoria/"
+  GetRateingApi:
+    Description: "API Gateway endpoint URL for Prod stage for GetRateing function"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/rateing/"
+  CreateRateingApi:
+    Description: "API Gateway endpoint URL for Prod stage for CreateRateing function"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/rateing/"
+  UpdateRateingApi:
+    Description: "API Gateway endpoint URL for Prod stage for UpdateRateing function"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/rateing/{id}"
+  DeleteRateingApi:
+    Description: "API Gateway endpoint URL for Prod stage for DeleteRateing function"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/rateing/{id}"
+  CreateSubscriptionApi:
+    Description: "API Gateway endpoint URL for Prod stage for CreateSubscription function"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/subscription/"
+  GetSubscriptionApi:
+    Description: "API Gateway endpoint URL for Prod stage for GetSubscription function"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/subscription/{subscription_id}"
+  CreateFavoriteApi:
+    Description: "API Gateway endpoint URL for Prod stage for CreateFavorite function"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/favorito"
+  DeleteFavoriteApi:
+    Description: "API Gateway endpoint URL for Prod stage for DeleteFavorite function"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/favorito"
+  GetFavoriteApi:
+    Description: "API Gateway endpoint URL for Prod stage for GetFavorite function"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/favorito"

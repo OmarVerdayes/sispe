@@ -1,0 +1,25 @@
+version = 0.1
+[default.deploy.parameters]
+stack_name = "sispeBackend"
+s3_bucket = "sispe-backend-bucket"
+s3_prefix = "sispeBackend"
+region = "us-east-1"
+profile = "sispe"
+confirm_changeset = true
+capabilities = "CAPABILITY_IAM"
+resolve_s3 = true
+disable_rollback = true
+parameter_overrides = "DBUser=\"admin\" DBPassword=\"nhL5zPpY1I9w\" DBName=\"sispe\" DBHost=\"integradora-lambda.czc42euyq8iq.us-east-1.rds.amazonaws.com\""
+image_repositories = []
+
+[default.package.parameters]
+resolve_s3 = true
+
+[default.sync.parameters]
+watch = true
+
+[default.local_start_api.parameters]
+warm_containers = "EAGER"
+
+[default.local_start_lambda.parameters]
+warm_containers = "EAGER"

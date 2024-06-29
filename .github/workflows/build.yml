@@ -1,0 +1,210 @@
+name: Build
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  sonarcloud:
+    name: SonarCloud
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.9'
+
+      # Instalación de dependencias para categorías
+      - name: Install dependencies for get_categories
+        run: |
+          cd get_categories
+          pip install -r requirements.txt
+      - name: Install dependencies for insert_category
+        run: |
+          cd create_category
+          pip install -r requirements.txt
+      - name: Install dependencies for update_category
+        run: |
+          cd update_category
+          pip install -r requirements.txt
+      - name: Install dependencies for delete_category
+        run: |
+          cd delete_category
+          pip install -r requirements.txt
+      # Instalación de dependencias para favoritos
+      - name: Install dependencies for get_favorites
+        run: |
+          cd get_favorites
+          pip install -r requirements.txt
+      - name: Install dependencies for create_favorite
+        run: |
+          cd create_favorite
+          pip install -r requirements.txt
+      - name: Install dependencies for delete_favorite
+        run: |
+          cd delete_favorite
+          pip install -r requirements.txt
+      # Instalación de dependencias para películas
+      - name: Install dependencies for get_films
+        run: |
+          cd get_films
+          pip install -r requirements.txt
+      - name: Install dependencies for create_film
+        run: |
+          cd create_film
+          pip install -r requirements.txt
+      - name: Install dependencies for update_film
+        run: |
+          cd update_film
+          pip install -r requirements.txt
+      - name: Install dependencies for delete_film
+        run: |
+          cd delete_film
+          pip install -r requirements.txt
+      # Instalación de dependencias para rateings
+      - name: Install dependencies for create_rateing
+        run: |
+          cd create_rateing
+          pip install -r requirements.txt
+      - name: Install dependencies for get_rateing
+        run: |
+          cd get_rateing
+          pip install -r requirements.txt
+      - name: Install dependencies for update_rateing
+        run: |
+          cd update_rateing
+          pip install -r requirements.txt
+      - name: Install dependencies for delete_rateing
+        run: |
+          cd delete_rateing
+          pip install -r requirements.txt
+      # Instalación de dependencias para subscripciones
+      - name: Install dependencies for create_subscription
+        run: |
+          cd create_subscription
+          pip install -r requirements.txt
+      - name: Install dependencies for get_subscription
+        run: |
+          cd get_subscription
+          pip install -r requirements.txt
+
+      # Ejecución de escaneo con SonarCloud
+      - name: SonarCloud Scan
+        uses: SonarSource/sonarcloud-github-action@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+  deploy_lambda:
+    name: Deploy Lambda to AWS
+    runs-on: ubuntu-latest
+    needs: sonarcloud
+    if: ${{ github.event_name == 'push' || github.event_name == 'pull_request' }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.9'
+      # Instalación de dependencias para categorías
+      - name: Install dependencies for get_categories
+        run: |
+          cd get_categories
+          pip install -r requirements.txt
+      - name: Install dependencies for insert_category
+        run: |
+          cd create_category
+          pip install -r requirements.txt
+      - name: Install dependencies for update_category
+        run: |
+          cd update_category
+          pip install -r requirements.txt
+      - name: Install dependencies for delete_category
+        run: |
+          cd delete_category
+          pip install -r requirements.txt
+      # Instalación de dependencias para favoritos
+      - name: Install dependencies for get_favorites
+        run: |
+          cd get_favorites
+          pip install -r requirements.txt
+      - name: Install dependencies for create_favorite
+        run: |
+          cd create_favorite
+          pip install -r requirements.txt
+      - name: Install dependencies for delete_favorite
+        run: |
+          cd delete_favorite
+          pip install -r requirements.txt
+      # Instalación de dependencias para películas
+      - name: Install dependencies for get_films
+        run: |
+          cd get_films
+          pip install -r requirements.txt
+      - name: Install dependencies for create_film
+        run: |
+          cd create_film
+          pip install -r requirements.txt
+      - name: Install dependencies for update_film
+        run: |
+          cd update_film
+          pip install -r requirements.txt
+      - name: Install dependencies for delete_film
+        run: |
+          cd delete_film
+          pip install -r requirements.txt
+      # Instalación de dependencias para rateings
+      - name: Install dependencies for create_rateing
+        run: |
+          cd create_rateing
+          pip install -r requirements.txt
+      - name: Install dependencies for get_rateing
+        run: |
+          cd get_rateing
+          pip install -r requirements.txt
+      - name: Install dependencies for update_rateing
+        run: |
+          cd update_rateing
+          pip install -r requirements.txt
+      - name: Install dependencies for delete_rateing
+        run: |
+          cd delete_rateing
+          pip install -r requirements.txt
+      # Instalación de dependencias para subscripciones
+      - name: Install dependencies for create_subscription
+        run: |
+          cd create_subscription
+          pip install -r requirements.txt
+      - name: Install dependencies for get_subscription
+        run: |
+          cd get_subscription
+          pip install -r requirements.txt
+
+      # Instalación de AWS CLI & SAM CLI
+      - name: Install AWS CLI
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y awscli
+      - name: Install SAM CLI
+        run: |
+          pip install aws-sam-cli
+      # Construir el proyecto
+      - name: Build SAM application
+        run: sam build
+      # Despliegue del proyecto
+      - name: Deploy to Production
+        run: sam deploy --no-confirm-changeset --no-fail-on-empty-changeset --stack-name sispeBackend --capabilities CAPABILITY_IAM
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: us-east-1
